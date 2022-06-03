@@ -1,0 +1,7 @@
+//Apenas para compreensão:
+
+//request é uma função que irá enviar uma requisição para uma Api e o ("cy" significa q estamos trabalhando com cypress)
+        cy.request({            
+            method: 'POST',    //aqui é uma requisição(endpoint)
+
+//length -> é uma propriedade que consegue obter a quantidade de caracteres de uma string
