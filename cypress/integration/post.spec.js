@@ -1,37 +1,30 @@
-import { functionsIn } from "cypress/types/lodash"
-
 //describe -> é um agrupador de testes do cypress
-describe('POST /characters', function(){
+describe('POST /characters', function () {
 
-    before(function(){
+    before(function () {
         cy.back2ThePast()
-        cy.setToken()  
+        cy.setToken()
+
     })
 
-    it('deve cadastrar um personagem',function(){
-        
+    it('deve cadastrar um personagem', function () {
+
         const character = {
             name: 'Wanda Maximoff',
             alias: 'Feiticeira Escarlate',
-            team:['Vingadores'],
+            team: ['Vingadores'],
             active: true
         }
 
-        cy.api({
-            method: 'POST',   //aqui é uma requisição(endpoit)
-            url: '/characters',
-            body: character,
-            headers:{
-                Authorization: Cypress.env('token')
-            }
-        }).then(function(response){
-            expect(response.status).to.eql(201)
-            cy.log(response.body.character_id)
-            expect(response.body.character_id.length).to.eql(24)
-        })
+        cy.postCharacter(character)
+            .then(function (response) {
+                expect(response.status).to.eql(201)
+                cy.log(response.body.character_id)
+                expect(response.body.character_id.length).to.eql(24)
+            })
     })
 
-    context.only('quando o personagem já existe', function(){
+    context('quando o personagem já existe', function () {
 
         const character = {
             name: 'Pietro Maximoff',
@@ -43,37 +36,44 @@ describe('POST /characters', function(){
             active: true
         }
 
-        before(function(){
-            cy.api({
-                method: 'POST',   
-                url: '/characters',
-                body: character,
-                headers:{
-                    Authorization: Cypress.env('token')
-                }
-            }).then(function(response){
+
+        before(function () {
+            cy.postCharacter(character).then(function (response) {
                 expect(response.status).to.eql(201)
-                
             })
         })
 
-        it('não deve cadastrar duplicado', function(){
-            cy.api({
-                method: 'POST',   //aqui é uma requisição(endpoit)
-                url: '/characters',
-                body: character,
-                headers:{
-                    Authorization: Cypress.env('token')
-                }
-            }).then(function(response){
+
+        it('não deve cadastrar duplicado', function () {
+            cy.postCharacter(character).then(function (response) {
                 expect(response.status).to.eql(400)
                 expect(response.body.error).to.eql('Duplicate character')
+            })
         })
+
+        it('preencher os campos obrigatórios', function () {
+            cy.expect('name')
+            //.should('be.visible')
+            //.type('Pietro Maximoff')
+            cy.expect('alias')
+            //.should('be.visible')
+            //.type('codinome')
+            cy.expect('team')
+            //.should('be.visible')
+            //.type('vingadores da costa oeste',
+            //'irmandade da mutantes')
+
+
     })
+
+})
+
 })
 
 
 
 
 
-//Adicionei um biblioteca que vai gerar nomes dinâmicos, para permitir que o teste não retorne erro "Bad Request" referente "Duplicate character"
+
+
+
